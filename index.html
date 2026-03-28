@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<title>炒飯點單</title>
+
+<style>
+body {
+  font-family: sans-serif;
+  background: #f5f5f5;
+  padding: 5px;
+}
+
+.item {
+  background: #fff;
+  padding: 8px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+}
+
+.titlerow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.count {
+  min-width: 20px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+button {
+  font-size: 16px;
+  padding: 6px 10px;
+  border-radius: 6px;
+}
+
+.special {
+  background: #ffe4c4;
+  margin: 5px 0;
+  padding: 5px;
+  border-radius: 5px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.special label {
+  display: inline-flex;
+  align-items: center;
+}
+
+label {
+  display: inline-flex;
+  align-items: center;
+  margin: 4px;
+  padding: 6px;
+  background: #eee;
+  border-radius: 6px;
+}
+
+input[type="checkbox"]:checked + span {
+  font-weight: bold;
+  color: #d35400;
+}
+</style>
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script>
+const options = ["加辣","不豆","不蔥","外帶","少油","不肉絲","內用","白炒","重口味"];
+
+const data = [
+ {name:"蝦仁炒飯", count:0, specials:[]},
+ {name:"肉絲炒飯", count:0, specials:[]}
+];
+
+function render(){
+ let html="";
+ data.forEach((item,i)=>{
+  html+=`
+  <div class="item">
+    <div class="titlerow">
+      <b>${item.name}</b>
+      <div>
+        <button onclick="add(${i},-1)">-</button>
+        <span class="count">${item.count}</span>
+        <button onclick="add(${i},1)">+</button>
+      </div>
+    </div>
+
+    ${item.specials.map((s,idx)=>`
+      <div class="special">
+        ${s}
+        <button onclick="del(${i},${idx})">X</button>
+      </div>
+    `).join("")}
+
+    <div>
+      ${options.map(o=>`
+        <label>
+          <input type="checkbox" name="opt${i}" value="${o}">
+          <span>${o}</span>
+        </label>
+      `).join("")}
+    </div>
+
+    <button onclick="addSpecial(${i})">✔ 加入</button>
+  </div>
+  `;
+ });
+ document.getElementById("app").innerHTML=html;
+}
+
+function add(i,n){
+ data[i].count=Math.max(0,data[i].count+n);
+ render();
+}
+
+function addSpecial(i){
+ const checked=[...document.getElementsByName("opt"+i)]
+  .filter(x=>x.checked)
+  .map(x=>x.value);
+
+ if(checked.length===0) return;
+
+ data[i].specials.unshift(checked.join(" / "));
+ data[i].count++;
+
+ render();
+}
+
+function del(i,idx){
+ data[i].specials.splice(idx,1);
+ data[i].count--;
+ render();
+}
+
+render();
+</script>
+
+</body>
+</html>
